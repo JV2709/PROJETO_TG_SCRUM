@@ -17,10 +17,10 @@
             <span>Aprendiz de Investidor</span>
         </div>
         <nav class="menu">
-            <a href="#">Início</a>
+            <a href="{% url 'home' %}">Início</a>
             <a href="#">Mercado</a>
+            <a href="{% url 'dicionario' %}">Dicionário do investidor</a>
             <a href="#">Perfil do investidor</a>
-            <a href="#">Dicionário do investidor</a>
             <a href="#">Investimentos</a>
         </nav>
     </header>
@@ -71,14 +71,14 @@
 
     <script>
         function createTicker() {
-            // Faz a requisição para a sua API Django
+
             fetch('{% url "stock_api" %}')
                 .then(response => response.json())
                 .then(data => {
                     const tickerContent = document.querySelector('.ticker-content');
                     let tickerHtml = '';
 
-                    // Cria o HTML para cada ação
+
                     data.forEach(stock => {
                         const price = parseFloat(stock.price).toFixed(2);
                         const change = parseFloat(stock.change_percent).toFixed(2);
@@ -93,10 +93,10 @@
                         `;
                     });
 
-                    // Duplica o conteúdo para criar um loop contínuo
+
                     tickerContent.innerHTML = tickerHtml + tickerHtml;
 
-                    // Ativa a animação CSS
+
                     tickerContent.style.animationPlayState = 'running';
                 })
                 .catch(error => {
@@ -107,10 +107,9 @@
                 });
         }
 
-        // Inicia a criação do carrossel quando a página carrega
+
         createTicker();
 
-        // Atualiza os dados a cada 5 minutos (300000 ms)
         setInterval(createTicker, 300000);
     </script>
 

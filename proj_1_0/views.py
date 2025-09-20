@@ -1,4 +1,3 @@
-# proj_1_0/views.py
 
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -6,10 +5,10 @@ from django.core.cache import cache
 import requests
 import json
 import time
-from .models import Card2, CARROSSEL
+from .models import Card2, CARROSSEL, DICIONARIO
 from decimal import Decimal
+from itertools import groupby
 
-# A função home deve buscar os cards e renderizar o template
 def home(request):
     card1 = Card2.objects.get(pk=1)
     card2 = Card2.objects.get(pk=2)
@@ -23,7 +22,6 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-# A view para o carrossel agora busca dados do seu banco de dados
 def get_stock_data(request):
     cache_key = 'stock_data_cache'
     stock_data_cached = cache.get(cache_key)
@@ -31,7 +29,7 @@ def get_stock_data(request):
     if stock_data_cached:
         return JsonResponse(stock_data_cached, safe=False)
 
-    # Busca todos os itens do carrossel do banco de dados
+   
     ticker_items = CARROSSEL.objects.all()
 
     stock_data = []
@@ -45,3 +43,19 @@ def get_stock_data(request):
     cache.set(cache_key, stock_data, 300)
 
     return JsonResponse(stock_data, safe=False)
+
+
+def DICIONARIO_view(request):
+    # Pega todos os termos do banco de dados e os ordena por Categoria e Título.
+    terms = DICIONARIO.objects.all().order_by('CATEGORIA', 'TITULO')
+
+    # Agrupa os termos usando a CATEGORIA como critério.
+    grouped_terms = {}
+    for CATEGORIA, group in groupby(terms, key=lambda x: x.CATEGORIA):
+        grouped_terms[CATEGORIA] = list(group)
+
+    context = {
+        'grouped_terms': grouped_terms,
+    }
+    
+    return render(request, 'DICIONARIO.html', context)
