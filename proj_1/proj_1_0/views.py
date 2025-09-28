@@ -1,50 +1,71 @@
+
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.cache import cache
 import requests
 import json
 import time
+from .models import Card2, CARROSSEL, DICIONARIO,Investimento
+from decimal import Decimal
+from itertools import groupby
 
 def home(request):
-    return render(request, 'home.html')
+    card1 = Card2.objects.get(pk=1)
+    card2 = Card2.objects.get(pk=2)
+    card3 = Card2.objects.get(pk=3)
+    
+    context = {
+        'card1': card1,
+        'card2': card2,
+        'card3': card3,
+    }
+    return render(request, 'home.html', context)
+
 
 def get_stock_data(request):
     cache_key = 'stock_data_cache'
-    
     stock_data_cached = cache.get(cache_key)
+
     if stock_data_cached:
         return JsonResponse(stock_data_cached, safe=False)
-    
-    api_key ='VUGWG583Z77XYTYU'
-    
-    symbols = [
-         'NFLX', 'NVDA',
-        'PETR4.SA', 'VALE3.SA', 'ITUB4.SA', 'BBDC4.SA', 'BBAS3.SA', 'ABEV3.SA'
-    ]
-    
+
+   
+    ticker_items = CARROSSEL.objects.all()
+
     stock_data = []
-    
-    for symbol in symbols:
-        url =f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={api_key}'
-        try:
-            response = requests.get(url, timeout=5)
-            data = response.json()
-            
-            if "Error Message" in data:
-                continue
-            
-            if 'Global Quote' in data:
-                quote = data['Global Quote']
-                stock_data.append({
-                    'symbol': quote['01. symbol'],
-                    'price': quote['05. price'],
-                    'change_percent': quote['10. change percent']
-                })
-        except requests.exceptions.RequestException as e:
-            continue
-            
-        time.sleep(1.5)
+    for item in ticker_items:
+        stock_data.append({
+            'symbol': item.SIMBOLO,
+            'price': str(item.PRECO),
+            'change_percent': str(item.VARIACAO),
+        })
 
     cache.set(cache_key, stock_data, 300)
-    
+
     return JsonResponse(stock_data, safe=False)
+
+
+def DICIONARIO_view(request):
+    # Pega todos os termos do banco de dados e os ordena por Categoria e Título.
+    terms = DICIONARIO.objects.all().order_by('CATEGORIA', 'TITULO')
+
+    # Agrupa os termos usando a CATEGORIA como critério.
+    grouped_terms = {}
+    for CATEGORIA, group in groupby(terms, key=lambda x: x.CATEGORIA):
+        grouped_terms[CATEGORIA] = list(group)
+
+    context = {
+        'grouped_terms': grouped_terms,
+    }
+    
+    return render(request, 'DICIONARIO.html', context)
+
+
+def investimentos_view(request):
+    todos_investimentos = Investimento.objects.all()
+    
+    context = {
+        'investments': todos_investimentos,
+    }
+    
+    return render(request, 'INVESTIMENTOS.html', context)

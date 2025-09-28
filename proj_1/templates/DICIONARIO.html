@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicionário do Investidor</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/glossary_style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" width="35" height="28"
+                    class="d-inline-block align-text-top">
+                Aprendiz de Investidor
+            </a>
+            <ul class="nav nav-underline nav justify-content-end">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}" style="color: white !important;">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="color: white !important;">Mercado</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dicionario' %}" style="color: white !important;">Dicionário do
+                        investidor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="color: white !important;">Perfil do investidor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'investimentos' %}"
+                        style="color: white !important;">Investimentos</a>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+
+
+    <div class="ticker-container">
+        <div class="ticker-content">
+        </div>
+    </div>
+
+    <div class="glossary-main-content">
+        <aside class="glossary-sidebar">
+            <h2 class="sidebar-title">Categorias</h2>
+            <ul class="category-list">
+                {% for category, terms in grouped_terms.items %}
+                <li>
+                    <a href="#{{ category|slugify }}" class="{% if forloop.first %}active{% endif %}">{{ category }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <section class="glossary-content">
+            <h1 class="page-title">Dicionário do Investidor</h1>
+
+            {% for category, terms in grouped_terms.items %}
+            <div class="category-section" id="{{ category|slugify }}">
+                <h2 class="category-title">{{ category }}</h2>
+                <div class="terms-grid">
+                    {% for term in terms %}
+                    <div class="term-item">
+                        <h3 class="term-title">{{ term.TITULO }}</h3>
+                        {% if term.IMAGEM %}
+                        <img src="{% static 'img/glossary/' %}{{ term.IMAGEM }}" alt="{{ term.TITULO }}">
+                        {% endif %}
+                        <p class="term-explanation">{{ term.TEXTO }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Aprendiz de Investidor — Desenvolvido por João Victor e equipe</p>
+    </footer>
+
+    <script src="{% static 'js/ticker.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebarLinks = document.querySelectorAll('.glossary-sidebar a');
+            const categorySections = document.querySelectorAll('.category-section');
+
+            const filterCategories = (targetId) => {
+                categorySections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            };
+
+            const firstLink = sidebarLinks[0];
+            const firstSectionId = firstLink.getAttribute('href').substring(1);
+
+            filterCategories(firstSectionId);
+
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    sidebarLinks.forEach(item => item.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    const targetId = e.target.getAttribute('href').substring(1);
+                    filterCategories(targetId);
+                });
+            });
+        });
+    </script>
+
+    <script>
+        function createTicker() {
+
+            fetch('{% url "stock_api" %}')
+                .then(response => response.json())
+                .then(data => {
+                    const tickerContent = document.querySelector('.ticker-content');
+                    let tickerHtml = '';
+
+
+                    data.forEach(stock => {
+                        const price = parseFloat(stock.price).toFixed(2);
+                        const change = parseFloat(stock.change_percent).toFixed(2);
+                        const isPositive = change >= 0;
+                        const color = isPositive ? 'green' : 'red';
+
+                        tickerHtml += `
+                            <span>
+                                ${stock.symbol} $${price} 
+                                <span style="color: ${color};">${change}%</span>
+                            </span>
+                        `;
+                    });
+
+
+                    tickerContent.innerHTML = tickerHtml + tickerHtml;
+
+
+                    tickerContent.style.animationPlayState = 'running';
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar dados da API:', error);
+                    const tickerContent = document.querySelector('.ticker-content');
+                    tickerContent.innerHTML = '<span>Erro ao carregar cotações.</span>';
+                    tickerContent.style.animationPlayState = 'paused';
+                });
+        }
+
+
+        createTicker();
+
+        setInterval(createTicker, 300000);
+    </script>
+
+</body>
+
+</html>

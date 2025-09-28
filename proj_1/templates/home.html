@@ -7,23 +7,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aprendiz de Investidor</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 
 <body>
 
-    <header class="navbar">
-        <div class="logo">
-            <img src="{% static 'img/logo.png' %}" alt="Logo">
-            <span>Aprendiz de Investidor</span>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" width="35" height="28"
+                    class="d-inline-block align-text-top">
+                Aprendiz de Investidor
+            </a>
+            <ul class="nav nav-underline nav justify-content-end">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}" style="color: white !important;">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="color: white !important;">Mercado</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dicionario' %}" style="color: white !important;">Dicionário do
+                        investidor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="color: white !important;">Perfil do investidor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'investimentos' %}"
+                        style="color: white !important;">Investimentos</a>
+                </li>
+
+            </ul>
         </div>
-        <nav class="menu">
-            <a href="#">Início</a>
-            <a href="#">Mercado</a>
-            <a href="#">Perfil do investidor</a>
-            <a href="#">Dicionário do investidor</a>
-            <a href="#">Investimentos</a>
-        </nav>
-    </header>
+    </nav>
+
+
 
     <div class="ticker-container">
         <div class="ticker-content">
@@ -33,35 +55,81 @@
     <div class="main-content">
         <h2 class="section-title">Quais os benefícios de Investir?</h2>
 
-        <section class="cards">
-            <div class="card">
-                <img src="{% static 'img/card1.png' %}" alt="Segurança">
-                <h3>Segurança e confiabilidade</h3>
-                <p>
-                    Em março, o número de investidores pessoas físicas na B3 alcançou 19,4 milhões,
-                    com alta de 2% no ano. Desde 2020, o crescimento já ultrapassa 80%.
-                </p>
-            </div>
-            <div class="card">
-                <img src="{% static 'img/card2.png' %}" alt="Rentabilidade">
-                <h3>Maiores rentabilidades</h3>
-                <p>
-                    Investir é uma maneira inteligente de fazer seu dinheiro crescer, oferecendo
-                    maior rentabilidade em comparação com opções tradicionais, ajudando a alcançar
-                    objetivos financeiros mais rapidamente.
-                </p>
-            </div>
-            <div class="card">
-                <img src="{% static 'img/card3.png' %}" alt="Saúde financeira">
-                <h3>Saúde financeira</h3>
-                <p>
-                    Investir transforma sua saúde financeira, multiplicando seu dinheiro,
-                    garantindo segurança e construindo um futuro sólido.
-                </p>
-            </div>
-        </section>
-    </div>
 
+        <section class="d-flex justify-content-center gap-4">
+            <div class="card" style="width: 18rem;">
+                <img src="{% static 'img/card1.png' %}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h3>{{ card1.TITULO }}</h3>
+                    <p>{{ card1.TEXTO }}</p>
+                </div>
+            </div>
+
+            <div class="card" style="width: 18rem;">
+                <img src="{% static 'img/card2.png' %}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h3>{{ card2.TITULO }}</h3>
+                    <p>{{ card2.TEXTO }}</p>
+                </div>
+            </div>
+
+            <div class="card" style="width: 18rem;">
+                <img src="{% static 'img/card3.png' %}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h3>{{ card3.TITULO }}</h3>
+                    <p>{{ card3.TEXTO }}</p>
+                </div>
+            </div>
+
+        </section>
+
+
+
+
+        <script>
+            function createTicker() {
+
+                fetch('{% url "stock_api" %}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tickerContent = document.querySelector('.ticker-content');
+                        let tickerHtml = '';
+
+
+                        data.forEach(stock => {
+                            const price = parseFloat(stock.price).toFixed(2);
+                            const change = parseFloat(stock.change_percent).toFixed(2);
+                            const isPositive = change >= 0;
+                            const color = isPositive ? 'green' : 'red';
+
+                            tickerHtml += `
+                            <span>
+                                ${stock.symbol} $${price} 
+                                <span style="color: ${color};">${change}%</span>
+                            </span>
+                        `;
+                        });
+
+
+                        tickerContent.innerHTML = tickerHtml + tickerHtml;
+
+
+                        tickerContent.style.animationPlayState = 'running';
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar dados da API:', error);
+                        const tickerContent = document.querySelector('.ticker-content');
+                        tickerContent.innerHTML = '<span>Erro ao carregar cotações.</span>';
+                        tickerContent.style.animationPlayState = 'paused';
+                    });
+            }
+
+
+            createTicker();
+
+            setInterval(createTicker, 300000);
+        </script>
+    </div>
     <section class="stats">
         <div>
             <h3>+19,4 MILHÕES</h3>
@@ -76,51 +144,6 @@
     <footer class="footer">
         <p>&copy; 2025 Aprendiz de Investidor — Desenvolvido por João Victor e equipe</p>
     </footer>
-
-    <script>
-        function createTicker() {
-            // Faz a requisição para a sua API Django
-            fetch('{% url "stock_api" %}')
-                .then(response => response.json())
-                .then(data => {
-                    const tickerContent = document.querySelector('.ticker-content');
-                    let tickerHtml = '';
-
-                    // Cria o HTML para cada ação
-                    data.forEach(stock => {
-                        const price = parseFloat(stock.price).toFixed(2);
-                        const change = parseFloat(stock.change_percent).toFixed(2);
-                        const isPositive = change >= 0;
-                        const color = isPositive ? 'green' : 'red';
-
-                        tickerHtml += `
-                            <span>
-                                ${stock.symbol} $${price} 
-                                <span style="color: ${color};">${change}%</span>
-                            </span>
-                        `;
-                    });
-
-                    // Duplica o conteúdo para criar um loop contínuo
-                    tickerContent.innerHTML = tickerHtml + tickerHtml;
-
-                    // Ativa a animação CSS
-                    tickerContent.style.animationPlayState = 'running';
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar dados da API:', error);
-                    const tickerContent = document.querySelector('.ticker-content');
-                    tickerContent.innerHTML = '<span>Erro ao carregar cotações.</span>';
-                    tickerContent.style.animationPlayState = 'paused';
-                });
-        }
-
-        // Inicia a criação do carrossel quando a página carrega
-        createTicker();
-
-        // Atualiza os dados a cada 5 minutos (300000 ms)
-        setInterval(createTicker, 300000);
-    </script>
 
 </body>
 
