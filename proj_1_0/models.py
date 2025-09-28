@@ -48,5 +48,23 @@ class CARROSSEL(models.Model):
     def __str__(self):
         return self.SIMBOLO
     
+class Investimento(models.Model):
+    TIPO= [
+        ('Renda Fixa', 'Renda Fixa'),
+        ('Renda Variável', 'Renda Variável'),
+    ]
+    
+    nome = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=15, choices=TIPO, default='Renda Fixa')
+    descricao = models.TextField()
+    rentabilidade = models.TextField()
+    link_imagem = models.CharField(max_length=255, blank=True, null=True)
 
+    class Meta:
+        verbose_name = "Investimento"
+        verbose_name_plural = "Investimentos"
+        ordering = ['tipo', 'nome']
+        
+    def __str__(self):
+        return self.nome
 

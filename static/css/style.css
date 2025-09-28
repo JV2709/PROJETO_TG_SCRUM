@@ -170,16 +170,25 @@ body {
 /* --- Estilos para o Dicionário do Investidor --- */
 
 .glossary-main-content {
+    width: 100%;
+    max-width: none;
+    /* Ignora qualquer max-width herdado */
+    margin-left: 0 !important;
+    /* Remove qualquer margem automática esquerda */
+
     display: flex;
     flex-direction: row;
-    padding: 20px;
+    padding: 20px 20px 20px 0;
+    /* Empurra o padding esquerdo para 0 */
     flex-grow: 1;
 }
 
 .glossary-sidebar {
     width: 250px;
     background-color: #f0f0f0;
-    padding: 20px;
+
+    margin-left: 0 !important;
+
     border-radius: 10px;
     margin-right: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -292,8 +301,27 @@ body {
 
 
 
-    /* Opcionalmente, se você quiser manter a formatação do span em outros lugares, pode ser mais específico: */
+
     .navbar .logo span {
         font-size: 1.2rem;
     }
+
+    .navbar-custom {
+        background-color: #1b5a5b !important;
+        color: white !important;
+    }
+
+
+    .navbar-custom .nav-item .nav-link {
+        color: white !important;
+    }
+
+
+    .navbar-custom .nav-link:hover,
+    .navbar-custom .nav-link:focus,
+    .navbar-custom .nav-link.active {
+        color: white !important;
+        text-decoration: underline;
+    }
+
 }

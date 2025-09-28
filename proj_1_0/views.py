@@ -5,7 +5,7 @@ from django.core.cache import cache
 import requests
 import json
 import time
-from .models import Card2, CARROSSEL, DICIONARIO
+from .models import Card2, CARROSSEL, DICIONARIO,Investimento
 from decimal import Decimal
 from itertools import groupby
 
@@ -59,3 +59,13 @@ def DICIONARIO_view(request):
     }
     
     return render(request, 'DICIONARIO.html', context)
+
+
+def investimentos_view(request):
+    todos_investimentos = Investimento.objects.all()
+    
+    context = {
+        'investments': todos_investimentos,
+    }
+    
+    return render(request, 'INVESTIMENTOS.html', context)
