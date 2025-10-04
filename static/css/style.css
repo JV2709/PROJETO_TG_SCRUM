@@ -26,6 +26,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+
 }
 
 .navbar {
@@ -168,18 +169,17 @@ body {
 }
 
 /* --- Estilos para o Dicionário do Investidor --- */
-
 .glossary-main-content {
     width: 100%;
-    max-width: none;
-    /* Ignora qualquer max-width herdado */
-    margin-left: 0 !important;
-    /* Remove qualquer margem automática esquerda */
+    /* Remova: max-width: none; */
+
+    /* CORREÇÃO 1: Adicione um padding lateral (como 20px) no lugar do 0 */
+    padding: 20px 20px;
+
+    /* Remova: margin-left: 0 !important; */
 
     display: flex;
     flex-direction: row;
-    padding: 20px 20px 20px 0;
-    /* Empurra o padding esquerdo para 0 */
     flex-grow: 1;
 }
 
@@ -187,12 +187,14 @@ body {
     width: 250px;
     background-color: #f0f0f0;
 
-    margin-left: 0 !important;
+    /* CORREÇÃO 2: Adicione uma margem à esquerda (como 20px) */
+    margin-left: 6px;
 
     border-radius: 10px;
     margin-right: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 
 .sidebar-title {
     font-size: 20px;
@@ -306,22 +308,53 @@ body {
         font-size: 1.2rem;
     }
 
-    .navbar-custom {
+
+
+    #investmentTabs {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    /* Estilo Básico para todos os botões (Define tamanho e arredondamento) */
+    ul#investmentTabs .nav-link {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 8px 30px;
+    }
+
+    /* ESTADO INATIVO: Borda e texto na cor do tema, fundo transparente */
+    /* ESTADO INATIVO: Borda e texto na cor do tema, fundo transparente */
+    /* Adicione esta seção ao seu style.css */
+
+    /* Usa o seletor mais genérico e forte contra o Bootstrap */
+    .nav-pills .nav-link:not(.active) {
+        color: #1b5a5b !important;
+        background-color: transparent !important;
+        border: 1px solid #1b5a5b !important;
+    }
+
+    /* 3. ESTADO ATIVO: Cor do Tema (#1b5a5b) */
+    /* Usa o seletor mais genérico e forte contra o Bootstrap */
+    .nav-pills .nav-link.active {
         background-color: #1b5a5b !important;
         color: white !important;
+        border: 1px solid #1b5a5b !important;
     }
 
-
-    .navbar-custom .nav-item .nav-link {
-        color: white !important;
+    /* Opcional: Garante que o hover fique escuro no inativo, se for o caso */
+    .nav-pills .nav-link:not(.active):hover {
+        background-color: #1b5a5b1a !important;
+        /* Um tom bem suave do seu tema */
     }
 
-
-    .navbar-custom .nav-link:hover,
-    .navbar-custom .nav-link:focus,
-    .navbar-custom .nav-link.active {
-        color: white !important;
-        text-decoration: underline;
+    /* Novo estilo para a página de INVESTIMENTOS */
+    .investment-content {
+        flex-grow: 1;
+        /* Ocupa o espaço vertical disponível, mas não centraliza */
     }
 
 }
