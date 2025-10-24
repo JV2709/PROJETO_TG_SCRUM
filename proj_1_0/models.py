@@ -67,4 +67,18 @@ class Investimento(models.Model):
         
     def __str__(self):
         return self.nome
+    
+class PerguntaPerfil(models.Model):
+    pergunta = models.CharField(max_length=300)
+    alternativa_um = models.CharField(max_length=300)
+    alternativa_dois = models.CharField(max_length=300)
+    alternativa_tres = models.CharField(max_length=300)
+
+    class Meta:
+        db_table = 'PROJ1_1_0_PERGUNTA_PERFIL'
+        verbose_name = 'Pergunta de Perfil'
+        verbose_name_plural = 'Perguntas de Perfil'
+
+    def __str__(self):
+        return self.pergunta
 

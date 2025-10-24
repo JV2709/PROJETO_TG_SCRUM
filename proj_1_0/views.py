@@ -8,6 +8,7 @@ import time
 from .models import Card2, CARROSSEL, DICIONARIO,Investimento
 from decimal import Decimal
 from itertools import groupby
+from .models import PerguntaPerfil
 
 def home(request):
     card1 = Card2.objects.get(pk=1)
@@ -69,3 +70,9 @@ def investimentos_view(request):
     }
     
     return render(request, 'INVESTIMENTOS.html', context)
+
+def perfil_investidor_view(request):
+    perguntas = PerguntaPerfil.objects.all()
+    context = {'perguntas': perguntas}
+    return render(request, 'PERFIL_INVESTIDOR.html', context)
+    

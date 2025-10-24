@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Investidor</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Ajustes visuais extras */
+        .form-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-check-input {
+            width: 1.3em;
+            height: 1.3em;
+            cursor: pointer;
+            border: 2px solid #1b5a5b;
+        }
+
+        .form-check-input:checked {
+            background-color: #1b5a5b;
+            border-color: #1b5a5b;
+            box-shadow: 0 0 5px rgba(27, 90, 91, 0.5);
+        }
+
+        .form-label {
+            font-size: 1.05rem;
+            color: #1b5a5b;
+        }
+
+        .form-check-label {
+            font-weight: 600;
+            color: #333;
+            margin-left: 12px;
+            /* 🔹 aumenta a distância entre o botão e o texto */
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 1.5rem;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-check {
+
+            border-radius: 10px;
+            padding: 10px 18px;
+            margin-right: 10px;
+            margin-bottom: 8px;
+            /* 🔹 espaçamento entre linhas */
+            transition: background-color 0.3s ease;
+        }
+
+
+
+        #resultado .card {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" width="35" height="28"
+                    class="d-inline-block align-text-top">
+                Aprendiz de Investidor
+            </a>
+            <ul class="nav nav-underline nav justify-content-end">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}" style="color: white !important;">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="color: white !important;">Mercado</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dicionario' %}" style="color: white !important;">Dicionário do
+                        investidor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'PERFIL_INVESTIDOR' %}" style="color: white !important;">Perfil do
+                        investidor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'investimentos' %}"
+                        style="color: white !important;">Investimentos</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="ticker-container">
+        <div class="ticker-content">
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content container my-5">
+        <h2 class="section-title text-center mb-4">Descubra seu Perfil de Investidor</h2>
+        <p class="text-center mb-5">Responda as perguntas abaixo para entender melhor seu perfil e encontrar o tipo de
+            investimento mais adequado para você.</p>
+
+        <form id="perfilForm" class="form-card">
+            {% for p in perguntas %}
+            <div class="form-section">
+                <label class="form-label fw-semibold d-block mb-3">{{ forloop.counter }}. {{ p.pergunta }}</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q{{ forloop.counter }}" value="1"
+                        id="q{{ forloop.counter }}_1">
+                    <label class="form-check-label" for="q{{ forloop.counter }}_1">{{ p.alternativa_um }}</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q{{ forloop.counter }}" value="2"
+                        id="q{{ forloop.counter }}_2">
+                    <label class="form-check-label" for="q{{ forloop.counter }}_2">{{ p.alternativa_dois }}</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q{{ forloop.counter }}" value="3"
+                        id="q{{ forloop.counter }}_3">
+                    <label class="form-check-label" for="q{{ forloop.counter }}_3">{{ p.alternativa_tres }}</label>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="text-center mt-4">
+                <button type="button" class="btn btn-success btn-lg px-5" onclick="calcularPerfil()">Ver
+                    resultado</button>
+            </div>
+        </form>
+
+        <div id="resultado" class="mt-5 text-center"></div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Aprendiz de Investidor — Desenvolvido por João Victor e equipe</p>
+    </footer>
+
+    <script>
+        function createTicker() {
+
+            fetch('{% url "stock_api" %}')
+                .then(response => response.json())
+                .then(data => {
+                    const tickerContent = document.querySelector('.ticker-content');
+                    let tickerHtml = '';
+
+
+                    data.forEach(stock => {
+                        const price = parseFloat(stock.price).toFixed(2);
+                        const change = parseFloat(stock.change_percent).toFixed(2);
+                        const isPositive = change >= 0;
+                        const color = isPositive ? 'green' : 'red';
+
+                        tickerHtml += `
+                            <span>
+                                ${stock.symbol} $${price} 
+                                <span style="color: ${color};">${change}%</span>
+                            </span>
+                        `;
+                    });
+
+
+                    tickerContent.innerHTML = tickerHtml + tickerHtml;
+
+
+                    tickerContent.style.animationPlayState = 'running';
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar dados da API:', error);
+                    const tickerContent = document.querySelector('.ticker-content');
+                    tickerContent.innerHTML = '<span>Erro ao carregar cotações.</span>';
+                    tickerContent.style.animationPlayState = 'paused';
+                });
+        }
+
+
+        createTicker();
+
+        setInterval(createTicker, 300000);
+    </script>
+
+
+    <script>
+        function calcularPerfil() {
+            let total = 0;
+            const perguntas = document.querySelectorAll('form .form-section');
+            for (let i = 1; i <= perguntas.length; i++) {
+                const resposta = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!resposta) {
+                    alert("Responda todas as perguntas antes de continuar.");
+                    return;
+                }
+                total += parseInt(resposta.value);
+            }
+
+            let perfil = "";
+            let descricao = "";
+
+            if (total <= (perguntas.length * 1.6)) {
+                perfil = "Conservador";
+                descricao = `
+                    <h3 class="text-primary mt-3">Perfil Conservador</h3>
+                    <p>Você preza pela segurança e prefere evitar grandes riscos. Invista em CDBs, Tesouro Direto e Fundos de Renda Fixa.</p>
+                `;
+            } else if (total <= (perguntas.length * 2.3)) {
+                perfil = "Moderado";
+                descricao = `
+                    <h3 class="text-warning mt-3">Perfil Moderado</h3>
+                    <p>Você busca equilíbrio entre risco e retorno. Considere fundos multimercado, ações estáveis e ETFs.</p>
+                `;
+            } else {
+                perfil = "Arrojado (Agressivo)";
+                descricao = `
+                    <h3 class="text-danger mt-3">Perfil Arrojado</h3>
+                    <p>Você tolera riscos e busca rentabilidade alta. Explore ações, criptoativos e fundos de investimento agressivos.</p>
+                `;
+            }
+
+            document.getElementById("resultado").innerHTML = `
+                <div class="card p-4 mt-3 shadow-sm">
+                    <h2>Seu perfil é: <strong>${perfil}</strong></h2>
+                    ${descricao}
+                </div>
+            `;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        }
+    </script>
+</body>
+
+</html>
