@@ -27,9 +27,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}" style="color: white !important;">Início</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" style="color: white !important;">Mercado</a>
-                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'dicionario' %}" style="color: white !important;">Dicionário do
                         investidor</a>
@@ -67,7 +65,7 @@
         </aside>
 
         <section class="glossary-content">
-            <h1 class="page-title">Dicionário do Investidor</h1>
+            <h1 class="section-title">Dicionário do Investidor</h1>
 
             {% for category, terms in grouped_terms.items %}
             <div class="category-section" id="{{ category|slugify }}">

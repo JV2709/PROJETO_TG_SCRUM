@@ -8,6 +8,7 @@
     <title>Perfil do Investidor</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         /* Ajustes visuais extras */
         .form-card {
@@ -73,6 +74,57 @@
     </style>
 </head>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const navbar = document.querySelector('nav.navbar');
+        const ticker = document.querySelector('.ticker-container');
+        const mainContent = document.querySelector('.main-content') || document.body;
+
+        // Garantias adicionais via JS
+        if (navbar) {
+            navbar.style.position = 'fixed';
+            navbar.style.top = '0';
+            navbar.style.left = '0';
+            navbar.style.right = '0';
+            navbar.style.zIndex = '2000';
+        }
+
+        // calcula alturas reais (inclui padding/border)
+        const navH = navbar ? navbar.getBoundingClientRect().height : 0;
+
+        if (ticker) {
+            ticker.style.position = 'fixed';
+            ticker.style.top = navH + 'px';
+            ticker.style.left = '0';
+            ticker.style.right = '0';
+            ticker.style.zIndex = '1990';
+        }
+
+        const tickerH = ticker ? ticker.getBoundingClientRect().height : 0;
+
+        // aplica variáveis CSS (úteis se você quiser usar no CSS)
+        document.documentElement.style.setProperty('--navbar-height', navH + 'px');
+        document.documentElement.style.setProperty('--ticker-height', tickerH + 'px');
+
+        // ajusta margin-top do conteúdo principal para não ficar escondido
+        const extra = 16; // pequena folga
+        if (mainContent) {
+            mainContent.style.marginTop = (navH + tickerH + extra) + 'px';
+        }
+
+        // Recalcula se a janela for redimensionada (útil para mobile)
+        window.addEventListener('resize', () => {
+            const navH2 = navbar ? navbar.getBoundingClientRect().height : 0;
+            if (ticker) ticker.style.top = navH2 + 'px';
+            const tickerH2 = ticker ? ticker.getBoundingClientRect().height : 0;
+            document.documentElement.style.setProperty('--navbar-height', navH2 + 'px');
+            document.documentElement.style.setProperty('--ticker-height', tickerH2 + 'px');
+            if (mainContent) mainContent.style.marginTop = (navH2 + tickerH2 + extra) + 'px';
+        });
+    });
+</script>
+
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
@@ -86,9 +138,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}" style="color: white !important;">Início</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" style="color: white !important;">Mercado</a>
-                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'dicionario' %}" style="color: white !important;">Dicionário do
                         investidor</a>
@@ -149,7 +199,7 @@
     </div>
 
     <footer class="footer">
-        <p>&copy; 2025 Aprendiz de Investidor — Desenvolvido por João Victor e equipe</p>
+        <p>&copy; 2025 Aprendiz de Investidor — Desenvolvido por João Victor e João Lucas</p>
     </footer>
 
     <script>
@@ -217,19 +267,28 @@
                 perfil = "Conservador";
                 descricao = `
                     <h3 class="text-primary mt-3">Perfil Conservador</h3>
-                    <p>Você preza pela segurança e prefere evitar grandes riscos. Invista em CDBs, Tesouro Direto e Fundos de Renda Fixa.</p>
+                    <p>O investidor **Conservador** prioriza a **preservação do capital** e a segurança acima de tudo. 
+                        Aversão a perdas é sua principal característica, o que significa que o foco deve ser em investimentos de **baixíssimo risco** e alta liquidez.
+                        Seu portfólio ideal é composto majoritariamente por **Renda Fixa (90%+)**. 
+                        **Recomendação de Investimento:** Invista em títulos como **Tesouro Direto (Selic)**, **CDBs/LCIs/LCAs** de bancos sólidos, e **Fundos de Renda Fixa** de baixo custo.</p>
                 `;
             } else if (total <= (perguntas.length * 2.3)) {
                 perfil = "Moderado";
                 descricao = `
                     <h3 class="text-warning mt-3">Perfil Moderado</h3>
-                    <p>Você busca equilíbrio entre risco e retorno. Considere fundos multimercado, ações estáveis e ETFs.</p>
+                    <p>O investidor **Moderado** busca o **equilíbrio** entre segurança e rentabilidade. 
+                        Você aceita correr um **risco controlado** em busca de retornos um pouco maiores, mas ainda valoriza a estabilidade. 
+                        Seu portfólio deve ser **diversificado**, misturando Renda Fixa com uma parcela de Renda Variável (aproximadamente **30% - 40%**).
+                        **Recomendação de Investimento:** Considere **Fundos Multimercado** (que diversificam o risco), **ETFs** (índices de mercado), e **Ações** de empresas blue chips (estáveis).</p>
                 `;
             } else {
                 perfil = "Arrojado (Agressivo)";
                 descricao = `
                     <h3 class="text-danger mt-3">Perfil Arrojado</h3>
-                    <p>Você tolera riscos e busca rentabilidade alta. Explore ações, criptoativos e fundos de investimento agressivos.</p>
+                    <p>O investidor 'Arrojado' (ou Agressivo) está disposto a assumir riscos mais elevados para buscar alta rentabilidade no longo prazo. 
+                        Você entende e aceita a volatilidade do mercado.
+                        Seu portfólio pode ter a maior parte alocada em Renda Variável (50%+), focando no potencial de crescimento.
+                        Recomendação de Investimento: Explore o mercado de Ações (incluindo small caps), Fundos de Ações, Criptoativos (com cautela), e Fundos de Investimento Imobiliário (FIIs)</p>
                 `;
             }
 
